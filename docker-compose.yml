@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  trading_botcli:
+    build: .
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+    command: go run main.go
+      
+  redis:
+    image: redis:alpine
+    environment:
+      - REDIS_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+volumes:
+  redis_data:
