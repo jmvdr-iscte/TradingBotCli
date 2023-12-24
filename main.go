@@ -19,11 +19,9 @@ import (
 
 func main() {
 
-	fmt.Println("Please select your prefered risk: ")
-	fmt.Println("You can choose between Low, Medium, High")
-
 	var risk_value string
 	var risk enums.Risk
+	var stop_gain float64
 	var err error
 
 	for {
@@ -39,8 +37,20 @@ func main() {
 	}
 	fmt.Println("You selected:", risk.String())
 
+	for {
+		fmt.Println("Please select your expected gain today")
+		_, err := fmt.Scanln(&stop_gain)
+		if err != nil {
+			fmt.Println("Invalid input. Please enter a number.")
+		} else {
+			break
+		}
+	}
+	fmt.Println("You selected:", stop_gain)
+
 	options := models.Options{
 		Risk: risk,
+		Gain: stop_gain,
 	}
 
 	redis_config := initialize.LoadRedisConfigs()

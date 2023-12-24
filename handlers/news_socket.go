@@ -54,10 +54,20 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 			fmt.Println("Read error: ", err)
 			return err
 		}
+		current_cash, err := s.AlpacaClient.GetCash()
+		if err != nil {
+			fmt.Println("unable to get current cash: %w", err)
+			return err
+		}
+
+		if current_cash >= s.Options.StartingValue+s.Options.Gain {
+			result := current_cash - s.Options.StartingValue
+			fmt.Printf("you gained %f\n:", result)
+			return io.EOF
+		}
 
 		message_buffer = append(message_buffer, buf[:n]...)
 		var messages []models.Message
-		fmt.Println("Received message: ", string(message_buffer))
 
 		if err := json.Unmarshal(message_buffer, &messages); err != nil {
 			if err == io.ErrUnexpectedEOF {
@@ -77,6 +87,7 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 				}
 			}
 		}
+		fmt.Println("Received message: ", string(message_buffer))
 		message_buffer = nil
 	}
 	return nil

@@ -114,13 +114,20 @@ func (client *AlpacaClient) IsMarketOpen() (bool, error) {
 }
 
 func (client *AlpacaClient) getBuyingPower() (float64, error) {
-	acount, err := client.tradeClient.GetAccount()
+	account, err := client.tradeClient.GetAccount()
 	if err != nil {
 		return 0, fmt.Errorf("get account %w", err)
 	}
-	return acount.BuyingPower.InexactFloat64(), nil
+	return account.BuyingPower.InexactFloat64(), nil
 }
 
+func (client *AlpacaClient) GetCash() (float64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.Cash.InexactFloat64(), nil
+}
 func (client *AlpacaClient) SellPosition(symbol string, response int, risk enums.Risk) error {
 	buying_power, err := client.getBuyingPower()
 	if err != nil {
