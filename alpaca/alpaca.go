@@ -121,6 +121,14 @@ func (client *AlpacaClient) getBuyingPower() (float64, error) {
 	return account.BuyingPower.InexactFloat64(), nil
 }
 
+func (client *AlpacaClient) getDayTradingBuyingPower() (float64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.DaytradingBuyingPower.InexactFloat64(), nil
+}
+
 func (client *AlpacaClient) GetCash() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
@@ -128,6 +136,7 @@ func (client *AlpacaClient) GetCash() (float64, error) {
 	}
 	return account.Cash.InexactFloat64(), nil
 }
+
 func (client *AlpacaClient) SellPosition(symbol string, response int, risk enums.Risk) error {
 	buying_power, err := client.getBuyingPower()
 	if err != nil {
@@ -242,6 +251,7 @@ func (client *AlpacaClient) GetQuantity(response int, symbol string, side enums.
 //	return nil
 //
 // //	}
+
 func (client *AlpacaClient) stopLoss(order_id string) error {
 
 	fmt.Printf("order_id %s", order_id)
