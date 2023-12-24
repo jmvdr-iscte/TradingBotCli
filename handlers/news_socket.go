@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
-	"github.com/jmvdr-iscte/TradingBot/models"
-	"github.com/jmvdr-iscte/TradingBot/server"
-	"github.com/jmvdr-iscte/TradingBot/worker"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
+	"github.com/jmvdr-iscte/TradingBotCli/server"
+	"github.com/jmvdr-iscte/TradingBotCli/worker"
 	"golang.org/x/net/websocket"
 )
 

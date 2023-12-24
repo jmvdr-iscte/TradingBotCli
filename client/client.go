@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/jmvdr-iscte/TradingBot/alpaca"
-	handler "github.com/jmvdr-iscte/TradingBot/handlers"
-	"github.com/jmvdr-iscte/TradingBot/initialize"
-	news "github.com/jmvdr-iscte/TradingBot/server"
+	"github.com/jmvdr-iscte/TradingBotCli/alpaca"
+	handler "github.com/jmvdr-iscte/TradingBotCli/handlers"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
+	news "github.com/jmvdr-iscte/TradingBotCli/server"
 
 	"golang.org/x/net/websocket"
 )

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/hibiken/asynq"
-	"github.com/jmvdr-iscte/TradingBot/models"
-	"github.com/jmvdr-iscte/TradingBot/open_ai"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
+	"github.com/jmvdr-iscte/TradingBotCli/open_ai"
 	"github.com/rs/zerolog/log"
 	"github.com/sashabaranov/go-openai"
 )

@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/google/uuid"
-	"github.com/jmvdr-iscte/TradingBot/enums"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
 )
 
 type Message struct {

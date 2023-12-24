@@ -8,12 +8,12 @@ import (
 	"syscall"
 
 	"github.com/hibiken/asynq"
-	"github.com/jmvdr-iscte/TradingBot/client"
-	"github.com/jmvdr-iscte/TradingBot/enums"
-	"github.com/jmvdr-iscte/TradingBot/initialize"
-	"github.com/jmvdr-iscte/TradingBot/models"
-	news "github.com/jmvdr-iscte/TradingBot/server"
-	"github.com/jmvdr-iscte/TradingBot/worker"
+	"github.com/jmvdr-iscte/TradingBotCli/client"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
+	news "github.com/jmvdr-iscte/TradingBotCli/server"
+	"github.com/jmvdr-iscte/TradingBotCli/worker"
 	"github.com/rs/zerolog/log"
 )
 

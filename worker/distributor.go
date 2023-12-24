@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/hibiken/asynq"
-	"github.com/jmvdr-iscte/TradingBot/models"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
 )
 
 type TaskDistributor interface {

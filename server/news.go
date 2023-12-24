@@ -4,9 +4,9 @@ import (
 	"log"
 	"sync"
 
-	"github.com/jmvdr-iscte/TradingBot/alpaca"
-	"github.com/jmvdr-iscte/TradingBot/models"
-	"github.com/jmvdr-iscte/TradingBot/worker"
+	"github.com/jmvdr-iscte/TradingBotCli/alpaca"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
+	"github.com/jmvdr-iscte/TradingBotCli/worker"
 	"golang.org/x/net/websocket"
 )
 

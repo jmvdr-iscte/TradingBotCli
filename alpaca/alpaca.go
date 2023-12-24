@@ -6,9 +6,9 @@ import (
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/alpaca"
 	"github.com/alpacahq/alpaca-trade-api-go/v3/marketdata"
-	"github.com/jmvdr-iscte/TradingBot/enums"
-	"github.com/jmvdr-iscte/TradingBot/initialize"
-	"github.com/jmvdr-iscte/TradingBot/utils"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
+	"github.com/jmvdr-iscte/TradingBotCli/utils"
 	"github.com/shopspring/decimal"
 )
 

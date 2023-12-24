@@ -1,7 +1,7 @@
 package open_ai
 
 import (
-	"github.com/jmvdr-iscte/TradingBot/initialize"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
 	"github.com/sashabaranov/go-openai"
 )
 

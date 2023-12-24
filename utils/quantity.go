@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/jmvdr-iscte/TradingBot/enums"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
 )
 
 func SellQuantity(response int64, buying_power float64, latest_quote float64, risk enums.Risk) int64 {
