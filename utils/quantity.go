@@ -8,7 +8,6 @@ import (
 )
 
 func SellQuantity(response int64, buying_power float64, latest_quote float64, risk enums.Risk) int64 {
-
 	multiplier, err := RiskMultiplier(risk)
 	if err != nil {
 		fmt.Println(err)
