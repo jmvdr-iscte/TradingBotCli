@@ -63,6 +63,10 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 		if current_cash >= s.Options.StartingValue+s.Options.Gain {
 			result := current_cash - s.Options.StartingValue
 			fmt.Printf("you gained %f\n:", result)
+			err = s.AlpacaClient.ClearOrders()
+			if err != nil {
+				return err
+			}
 			return io.EOF
 		}
 
