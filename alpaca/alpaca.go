@@ -121,12 +121,28 @@ func (client *AlpacaClient) getBuyingPower() (float64, error) {
 	return account.BuyingPower.InexactFloat64(), nil
 }
 
-func (client *AlpacaClient) getDayTradingBuyingPower() (float64, error) {
+func (client *AlpacaClient) GetDayTradingBuyingPower() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
 		return 0, fmt.Errorf("get account %w", err)
 	}
 	return account.DaytradingBuyingPower.InexactFloat64(), nil
+}
+
+func (client *AlpacaClient) GetDayTradingCount() (int64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.DaytradeCount, nil
+}
+
+func (client *AlpacaClient) IsBlocked() (bool, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return true, fmt.Errorf("get account %w", err)
+	}
+	return account.AccountBlocked, nil
 }
 
 func (client *AlpacaClient) GetCash() (float64, error) {
