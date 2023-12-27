@@ -1,4 +1,4 @@
-module github.com/jmvdr-iscte/TradingBot
+module github.com/jmvdr-iscte/TradingBotCli
 
 go 1.21.3
 
