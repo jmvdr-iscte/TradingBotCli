@@ -22,9 +22,9 @@ type NewsServer struct {
 func NewServer(task_distributor worker.TaskDistributor, options *models.Options) *NewsServer {
 	alpaca_client := *alpaca.LoadClient()
 	var err error
-	options.StartingValue, err = alpaca_client.GetCash()
+	options.StartingValue, err = alpaca_client.GetEquity()
 	if err != nil {
-		log.Fatalf("Failed to get cash: %v", err)
+		log.Fatalf("Failed to get equity: %v", err)
 		return nil
 	}
 	server := &NewsServer{

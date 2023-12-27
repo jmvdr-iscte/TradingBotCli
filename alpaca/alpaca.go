@@ -113,6 +113,23 @@ func (client *AlpacaClient) IsMarketOpen() (bool, error) {
 	return false, nil
 }
 
+func (client *AlpacaClient) HaveTrades() (bool, error) {
+	dayTradingCount, err := client.GetDayTradingCount()
+	if err != nil {
+		return false, fmt.Errorf("get day trading count %w", err)
+	}
+	equity, err := client.GetEquity()
+	if err != nil {
+		return false, fmt.Errorf("get equity %w", err)
+	}
+
+	if dayTradingCount >= 4 && equity < 25000 {
+		fmt.Println("warning: please do not make any more trades this week")
+		return false, nil
+	}
+	return true, nil
+}
+
 func (client *AlpacaClient) getBuyingPower() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
@@ -127,6 +144,14 @@ func (client *AlpacaClient) GetDayTradingBuyingPower() (float64, error) {
 		return 0, fmt.Errorf("get account %w", err)
 	}
 	return account.DaytradingBuyingPower.InexactFloat64(), nil
+}
+
+func (client *AlpacaClient) GetEquity() (float64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.Equity.InexactFloat64(), nil
 }
 
 func (client *AlpacaClient) GetDayTradingCount() (int64, error) {

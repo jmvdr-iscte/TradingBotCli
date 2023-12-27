@@ -31,9 +31,15 @@ func HandleWS(ws *websocket.Conn, s *server.NewsServer) {
 
 		delete(s.Conns, ws)
 		s.Mu.Unlock()
-	} else {
+		return
+	} else if err != nil {
 		fmt.Println("Error handling the websocket: ", err)
+		return
 	}
+	fmt.Println("websocker sucessfully closed")
+	s.Mu.Lock()
+	delete(s.Conns, ws)
+	s.Mu.Unlock()
 }
 
 func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) error {
@@ -54,20 +60,28 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 			fmt.Println("Read error: ", err)
 			return err
 		}
-		current_cash, err := s.AlpacaClient.GetCash()
+		haveTrades, err := s.AlpacaClient.HaveTrades()
 		if err != nil {
-			fmt.Println("unable to get current cash: %w", err)
-			return err
+			return fmt.Errorf("unable to get current trades: %w", err)
 		}
 
-		if current_cash >= s.Options.StartingValue+s.Options.Gain {
-			result := current_cash - s.Options.StartingValue
+		current_equity, err := s.AlpacaClient.GetEquity()
+		if err != nil {
+			return fmt.Errorf("unable to get current equity: %w", err)
+		}
+
+		if current_equity >= s.Options.StartingValue+s.Options.Gain {
+			result := current_equity - s.Options.StartingValue
 			fmt.Printf("you gained %f\n:", result)
 			err = s.AlpacaClient.ClearOrders()
 			if err != nil {
 				return err
 			}
-			return io.EOF
+			return nil
+		}
+
+		if !haveTrades {
+			return nil
 		}
 
 		message_buffer = append(message_buffer, buf[:n]...)
@@ -82,7 +96,7 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 		}
 
 		for _, message := range messages {
-			if len(message.Headline) == 1 {
+			if len(message.Headline) != 0 {
 				message.Uid = uuid.New()
 				message.Risk = s.Options.Risk
 				err = s.Task_distributor.DistributeTaskProcessOrder(context.Background(), &message, opts...)

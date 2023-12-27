@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/hibiken/asynq"
 	"github.com/jmvdr-iscte/TradingBotCli/client"
@@ -59,6 +60,7 @@ func main() {
 		Addr:     redis_config.Address,
 		Password: redis_config.Password,
 	}
+	go banana()
 
 	task_distributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(redisOpt) // tem de ser numa go routine pois tal como um servidor http, ele bloqueia se não tiver pedidos
@@ -67,7 +69,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 
@@ -100,5 +101,15 @@ func coerceToRisk(risk_str string) (enums.Risk, error) {
 		return enums.High, nil
 	default:
 		return 0, fmt.Errorf("invalid value for Risk: %s", risk_str)
+	}
+
+}
+
+func banana() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		fmt.Println("Banana")
 	}
 }
