@@ -70,6 +70,8 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 			return fmt.Errorf("unable to get current equity: %w", err)
 		}
 
+		fmt.Printf("current equity %f\n", current_equity)
+		fmt.Printf("possible gainz %f\n", s.Options.StartingValue+s.Options.Gain)
 		if current_equity >= s.Options.StartingValue+s.Options.Gain {
 			result := current_equity - s.Options.StartingValue
 			fmt.Printf("you gained %f\n:", result)

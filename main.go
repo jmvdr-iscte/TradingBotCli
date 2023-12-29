@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/hibiken/asynq"
 	"github.com/jmvdr-iscte/TradingBotCli/client"
@@ -60,7 +59,7 @@ func main() {
 		Addr:     redis_config.Address,
 		Password: redis_config.Password,
 	}
-	go banana()
+	//go banana()
 
 	task_distributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(redisOpt) // tem de ser numa go routine pois tal como um servidor http, ele bloqueia se não tiver pedidos
@@ -105,11 +104,11 @@ func coerceToRisk(risk_str string) (enums.Risk, error) {
 
 }
 
-func banana() {
-	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
+// func banana() {
+// 	ticker := time.NewTicker(5 * time.Second)
+// 	defer ticker.Stop()
 
-	for range ticker.C {
-		fmt.Println("Banana")
-	}
-}
+// 	for range ticker.C {
+// 		fmt.Println("Banana")
+// 	}
+// }
