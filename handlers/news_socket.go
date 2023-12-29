@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
-	"github.com/jmvdr-iscte/TradingBot/models"
-	"github.com/jmvdr-iscte/TradingBot/server"
-	"github.com/jmvdr-iscte/TradingBot/worker"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
+	"github.com/jmvdr-iscte/TradingBotCli/server"
+	"github.com/jmvdr-iscte/TradingBotCli/worker"
 	"golang.org/x/net/websocket"
 )
 
@@ -31,9 +31,15 @@ func HandleWS(ws *websocket.Conn, s *server.NewsServer) {
 
 		delete(s.Conns, ws)
 		s.Mu.Unlock()
-	} else {
+		return
+	} else if err != nil {
 		fmt.Println("Error handling the websocket: ", err)
+		return
 	}
+	fmt.Println("websocker sucessfully closed")
+	s.Mu.Lock()
+	delete(s.Conns, ws)
+	s.Mu.Unlock()
 }
 
 func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) error {
@@ -54,10 +60,34 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 			fmt.Println("Read error: ", err)
 			return err
 		}
+		haveTrades, err := s.AlpacaClient.HaveTrades()
+		if err != nil {
+			return fmt.Errorf("unable to get current trades: %w", err)
+		}
+
+		current_equity, err := s.AlpacaClient.GetEquity()
+		if err != nil {
+			return fmt.Errorf("unable to get current equity: %w", err)
+		}
+
+		fmt.Printf("current equity %f\n", current_equity)
+		fmt.Printf("possible gainz %f\n", s.Options.StartingValue+s.Options.Gain)
+		if current_equity >= s.Options.StartingValue+s.Options.Gain {
+			result := current_equity - s.Options.StartingValue
+			fmt.Printf("you gained %f\n:", result)
+			err = s.AlpacaClient.ClearOrders()
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
+		if !haveTrades {
+			return nil
+		}
 
 		message_buffer = append(message_buffer, buf[:n]...)
 		var messages []models.Message
-		fmt.Println("Received message: ", string(message_buffer))
 
 		if err := json.Unmarshal(message_buffer, &messages); err != nil {
 			if err == io.ErrUnexpectedEOF {
@@ -77,6 +107,7 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option) err
 				}
 			}
 		}
+		fmt.Println("Received message: ", string(message_buffer))
 		message_buffer = nil
 	}
 	return nil

@@ -6,8 +6,8 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 
-	"github.com/jmvdr-iscte/TradingBot/alpaca"
-	"github.com/jmvdr-iscte/TradingBot/open_ai"
+	"github.com/jmvdr-iscte/TradingBotCli/alpaca"
+	"github.com/jmvdr-iscte/TradingBotCli/open_ai"
 	"github.com/sashabaranov/go-openai"
 )
 

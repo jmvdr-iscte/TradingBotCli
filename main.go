@@ -8,22 +8,20 @@ import (
 	"syscall"
 
 	"github.com/hibiken/asynq"
-	"github.com/jmvdr-iscte/TradingBot/client"
-	"github.com/jmvdr-iscte/TradingBot/enums"
-	"github.com/jmvdr-iscte/TradingBot/initialize"
-	"github.com/jmvdr-iscte/TradingBot/models"
-	news "github.com/jmvdr-iscte/TradingBot/server"
-	"github.com/jmvdr-iscte/TradingBot/worker"
+	"github.com/jmvdr-iscte/TradingBotCli/client"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
+	"github.com/jmvdr-iscte/TradingBotCli/models"
+	news "github.com/jmvdr-iscte/TradingBotCli/server"
+	"github.com/jmvdr-iscte/TradingBotCli/worker"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
 
-	fmt.Println("Please select your prefered risk: ")
-	fmt.Println("You can choose between Low, Medium, High")
-
 	var risk_value string
 	var risk enums.Risk
+	var stop_gain float64
 	var err error
 
 	for {
@@ -39,8 +37,20 @@ func main() {
 	}
 	fmt.Println("You selected:", risk.String())
 
+	for {
+		fmt.Println("Please select your expected gain today")
+		_, err := fmt.Scanln(&stop_gain)
+		if err != nil {
+			fmt.Println("Invalid input. Please enter a number.")
+		} else {
+			break
+		}
+	}
+	fmt.Println("You selected:", stop_gain)
+
 	options := models.Options{
 		Risk: risk,
+		Gain: stop_gain,
 	}
 
 	redis_config := initialize.LoadRedisConfigs()
@@ -49,6 +59,7 @@ func main() {
 		Addr:     redis_config.Address,
 		Password: redis_config.Password,
 	}
+	//go banana()
 
 	task_distributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(redisOpt) // tem de ser numa go routine pois tal como um servidor http, ele bloqueia se não tiver pedidos
@@ -57,7 +68,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 
@@ -91,4 +101,14 @@ func coerceToRisk(risk_str string) (enums.Risk, error) {
 	default:
 		return 0, fmt.Errorf("invalid value for Risk: %s", risk_str)
 	}
+
 }
+
+// func banana() {
+// 	ticker := time.NewTicker(5 * time.Second)
+// 	defer ticker.Stop()
+
+// 	for range ticker.C {
+// 		fmt.Println("Banana")
+// 	}
+// }

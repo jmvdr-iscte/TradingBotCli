@@ -3,7 +3,6 @@ module github.com/jmvdr-iscte/TradingBotCli
 go 1.21.3
 
 require (
-	github.com/RobinUS2/golang-moving-average v1.0.0
 	github.com/alpacahq/alpaca-trade-api-go/v3 v3.2.2
 	github.com/google/uuid v1.4.0
 	github.com/hibiken/asynq v0.24.1
@@ -31,7 +30,4 @@ require (
 	github.com/rs/zerolog v1.31.0
 	github.com/sashabaranov/go-openai v1.17.9
 	github.com/shopspring/decimal v1.3.1
-	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
-	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	nhooyr.io/websocket v1.8.10 // indirect
 )

@@ -6,9 +6,9 @@ import (
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/alpaca"
 	"github.com/alpacahq/alpaca-trade-api-go/v3/marketdata"
-	"github.com/jmvdr-iscte/TradingBot/enums"
-	"github.com/jmvdr-iscte/TradingBot/initialize"
-	"github.com/jmvdr-iscte/TradingBot/utils"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
+	"github.com/jmvdr-iscte/TradingBotCli/utils"
 	"github.com/shopspring/decimal"
 )
 
@@ -113,12 +113,69 @@ func (client *AlpacaClient) IsMarketOpen() (bool, error) {
 	return false, nil
 }
 
+func (client *AlpacaClient) HaveTrades() (bool, error) {
+	dayTradingCount, err := client.GetDayTradingCount()
+	if err != nil {
+		return false, fmt.Errorf("get day trading count %w", err)
+	}
+	equity, err := client.GetEquity()
+	if err != nil {
+		return false, fmt.Errorf("get equity %w", err)
+	}
+
+	if dayTradingCount >= 4 && equity < 25000 {
+		fmt.Println("warning: please do not make any more trades this week")
+		return false, nil
+	}
+	return true, nil
+}
+
 func (client *AlpacaClient) getBuyingPower() (float64, error) {
-	acount, err := client.tradeClient.GetAccount()
+	account, err := client.tradeClient.GetAccount()
 	if err != nil {
 		return 0, fmt.Errorf("get account %w", err)
 	}
-	return acount.BuyingPower.InexactFloat64(), nil
+	return account.BuyingPower.InexactFloat64(), nil
+}
+
+func (client *AlpacaClient) GetDayTradingBuyingPower() (float64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.DaytradingBuyingPower.InexactFloat64(), nil
+}
+
+func (client *AlpacaClient) GetEquity() (float64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.Equity.InexactFloat64(), nil
+}
+
+func (client *AlpacaClient) GetDayTradingCount() (int64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.DaytradeCount, nil
+}
+
+func (client *AlpacaClient) IsBlocked() (bool, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return true, fmt.Errorf("get account %w", err)
+	}
+	return account.AccountBlocked, nil
+}
+
+func (client *AlpacaClient) GetCash() (float64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.Cash.InexactFloat64(), nil
 }
 
 func (client *AlpacaClient) SellPosition(symbol string, response int, risk enums.Risk) error {
@@ -235,6 +292,7 @@ func (client *AlpacaClient) GetQuantity(response int, symbol string, side enums.
 //	return nil
 //
 // //	}
+
 func (client *AlpacaClient) stopLoss(order_id string) error {
 
 	fmt.Printf("order_id %s", order_id)

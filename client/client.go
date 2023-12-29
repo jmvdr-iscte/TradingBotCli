@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/jmvdr-iscte/TradingBot/alpaca"
-	handler "github.com/jmvdr-iscte/TradingBot/handlers"
-	"github.com/jmvdr-iscte/TradingBot/initialize"
-	news "github.com/jmvdr-iscte/TradingBot/server"
+	"github.com/jmvdr-iscte/TradingBotCli/alpaca"
+	"github.com/jmvdr-iscte/TradingBotCli/handlers"
+	"github.com/jmvdr-iscte/TradingBotCli/initialize"
+	news "github.com/jmvdr-iscte/TradingBotCli/server"
 
 	"golang.org/x/net/websocket"
 )
@@ -34,10 +34,15 @@ func ConnectToWebSocket(s *news.NewsServer) error {
 
 	isMarketOpen, err := alpaca_client.IsMarketOpen()
 	if err != nil {
-		fmt.Println("Error_ ", err)
+		return fmt.Errorf("unable to check the market conditions %w", err)
 	}
 
-	if !isMarketOpen {
+	haveTrades, err := alpaca_client.HaveTrades()
+	if err != nil {
+		return fmt.Errorf("unable to check the current trades %w", err)
+	}
+
+	if !isMarketOpen || !haveTrades {
 		err = ws.Close()
 		if err != nil {
 			fmt.Println("Error Closing the websocket", err)
@@ -77,6 +82,6 @@ func ConnectToWebSocket(s *news.NewsServer) error {
 			return fmt.Errorf("error in the websocket %w", err)
 		}
 	}
-	handler.HandleWS(ws, s)
+	handlers.HandleWS(ws, s)
 	return nil
 }
