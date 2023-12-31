@@ -54,14 +54,25 @@ func (client *AlpacaClient) ClearOrders() error {
 	return nil
 }
 
+func (client *AlpacaClient) ClosePositions() error {
+	req := alpaca.CloseAllPositionsRequest{
+		CancelOrders: true,
+	}
+	_, err := client.tradeClient.CloseAllPositions(req)
+	if err != nil {
+		return fmt.Errorf("unable to close all positions %w", err)
+	}
+	return nil
+}
+
 func (client *AlpacaClient) TradeOrder(symbol string, qty int64, side enums.OrderAction) error {
-	order_action, err := enums.ProcessOrderAction(side)
+	orderAction, err := enums.ProcessOrderAction(side)
 	if err != nil {
 		return fmt.Errorf("wrong order action: %w", err)
 	}
 
 	if qty > 0 {
-		adjSide := alpaca.Side(order_action)
+		adjSide := alpaca.Side(orderAction)
 		decimalQty := decimal.NewFromInt((qty))
 		order, err := client.tradeClient.PlaceOrder(alpaca.PlaceOrderRequest{
 			Symbol:      symbol,
@@ -123,7 +134,7 @@ func (client *AlpacaClient) HaveTrades() (bool, error) {
 		return false, fmt.Errorf("get equity %w", err)
 	}
 
-	if dayTradingCount >= 4 && equity < 25000 {
+	if dayTradingCount >= 3 && equity < 25000 {
 		fmt.Println("warning: please do not make any more trades this week")
 		return false, nil
 	}
@@ -179,13 +190,13 @@ func (client *AlpacaClient) GetCash() (float64, error) {
 }
 
 func (client *AlpacaClient) SellPosition(symbol string, response int, risk enums.Risk) error {
-	buying_power, err := client.getBuyingPower()
+	buyingPower, err := client.getBuyingPower()
 	if err != nil {
 		return fmt.Errorf("unable to get account: %w", err)
 	}
 
 	position, err := client.tradeClient.GetPosition(symbol)
-	if err != nil && buying_power >= 2000.0 {
+	if err != nil && buyingPower >= 2000.0 {
 
 		qty, err := client.GetQuantity(response, symbol, enums.Sell, risk)
 
@@ -239,74 +250,46 @@ func (client *AlpacaClient) getLastQuote(symbol string) (float64, error) {
 }
 
 func (client *AlpacaClient) GetQuantity(response int, symbol string, side enums.OrderAction, risk enums.Risk) (int64, error) {
-	buying_power, err := client.getBuyingPower()
+	buyingPower, err := client.getBuyingPower()
 	if err != nil {
 		return 0, fmt.Errorf("error getting buying power: %w", err)
 	}
 
-	latest_quote, err := client.getLastQuote(symbol)
+	latestQuote, err := client.getLastQuote(symbol)
 	if err != nil {
 		fmt.Println("error getting last quote: %w", err)
 	}
 
-	if latest_quote == 0.0 {
-		latest_quote = 1.0
+	if latestQuote == 0.0 {
+		latestQuote = 1.0
 	}
 
-	if side == enums.Buy {
-		return utils.BuyQuantity(int64(response), buying_power, latest_quote, risk), nil
-	} else {
-		return utils.SellQuantity(int64(response), buying_power, latest_quote, risk), nil
+	if risk == enums.Medium || risk == enums.Low || risk == enums.High {
+		if side == enums.Buy {
+			return utils.BuyPDTQuantity(int64(response), buyingPower, latestQuote, risk), nil
+		} else {
+			return utils.SellPDTQuantity(int64(response), buyingPower, latestQuote, risk), nil
+		}
+	} else if risk == enums.Safe || risk == enums.Power {
+		return utils.CalculateQuantity(buyingPower, latestQuote, risk), nil
 	}
+	return 0, nil
 }
 
-// func (client *AlpacaClient) getPercentChanges() error {
-// 	symbols := make([]string, len(alp.allStocks))
-// 	for i, stock := range algo.allStocks {
-// 		symbols[i] = stock.name
-// 	}
+func (client *AlpacaClient) stopLoss(orderId string) error {
 
-// 	// 20 minute percent changes
-// 	end := time.Now()
-// 	start := end.Add(-20 * time.Minute)
-// 	feed := "iex"
-
-// 	multiBars, err := client.dataClient.GetMultiBars(symbols, marketdata.GetBarsRequest{
-// 		TimeFrame: marketdata.OneMin,
-// 		Start:     start,
-// 		End:       end,
-// 		Feed:      feed,
-// 	})
-// 	if err != nil {
-// 		return fmt.Errorf("get multi bars: %w", err)
-// 	}
-
-// 	for i, symbol := range symbols {
-// 		bars := multiBars[symbol]
-// 		if len(bars) != 0 {
-// 			percentChange := (bars[len(bars)-1].Close - bars[0].Open) / bars[0].Open
-// 			algo.allStocks[i].pc = float64(percentChange)
-// 		}
-// 	}
-
-//	return nil
-//
-// //	}
-
-func (client *AlpacaClient) stopLoss(order_id string) error {
-
-	fmt.Printf("order_id %s", order_id)
-	order, err := client.tradeClient.GetOrder(order_id)
+	fmt.Printf("orderId %s", orderId)
+	order, err := client.tradeClient.GetOrder(orderId)
 	if err != nil {
 		return fmt.Errorf("order has not been filled, %w", err)
 	}
-	stop_loss_side := alpaca.Buy
+	stopLossSide := alpaca.Buy
 	if order.Side == alpaca.Buy {
-		stop_loss_side = alpaca.Sell
+		stopLossSide = alpaca.Sell
 	} else if order.Side == alpaca.Sell {
-		stop_loss_side = alpaca.Buy
+		stopLossSide = alpaca.Buy
 	}
-	fmt.Printf("THis is the order %v\n", order.FilledQty)
+
 	if order.FilledAvgPrice == nil {
 		return fmt.Errorf("FilledAvgPrice is nil")
 	}
@@ -314,7 +297,7 @@ func (client *AlpacaClient) stopLoss(order_id string) error {
 	_, err = client.tradeClient.PlaceOrder(alpaca.PlaceOrderRequest{
 		Symbol:      order.Symbol,
 		Qty:         order.Qty,
-		Side:        stop_loss_side,
+		Side:        stopLossSide,
 		Type:        "stop",
 		StopPrice:   &stop_price,
 		TimeInForce: "day",
@@ -322,7 +305,23 @@ func (client *AlpacaClient) stopLoss(order_id string) error {
 	if err != nil {
 		return fmt.Errorf("unable to set a stop loss: %w", err)
 	}
-	fmt.Println("managed to set stop loss order")
-
+	fmt.Println("stop loss order set")
 	return nil
+}
+
+func (client *AlpacaClient) CanClosePositions() (bool, error) {
+	clock, err := client.tradeClient.GetClock()
+	if err != nil {
+		return false, fmt.Errorf("get clock: %w", err)
+	}
+	nextClose := clock.NextClose
+	closeTime := nextClose.Add(-15 * time.Minute)
+	if clock.IsOpen && time.Now().After(closeTime) {
+		err := client.ClosePositions()
+		if err != nil {
+			return true, err
+		}
+		return true, nil
+	}
+	return false, nil
 }

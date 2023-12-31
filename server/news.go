@@ -27,6 +27,7 @@ func NewServer(task_distributor worker.TaskDistributor, options *models.Options)
 		log.Fatalf("Failed to get equity: %v", err)
 		return nil
 	}
+
 	server := &NewsServer{
 		Conns:            make(map[*websocket.Conn]bool),
 		Mu:               sync.Mutex{},

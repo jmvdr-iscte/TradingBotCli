@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hibiken/asynq"
+	"github.com/jmvdr-iscte/TradingBotCli/enums"
 	"github.com/jmvdr-iscte/TradingBotCli/models"
 	"github.com/jmvdr-iscte/TradingBotCli/open_ai"
 	"github.com/rs/zerolog/log"
@@ -38,6 +39,13 @@ func (distributor *RedisTaskDistributor) DistributeTaskProcessOrder(
 }
 
 func (processor *RedisTaskProcessor) ProcessTaskProcessOrder(ctx context.Context, task *asynq.Task) error {
+	riskLevels := map[enums.Risk]bool{
+		enums.Power: true,
+		enums.Safe:  true,
+	}
+
+	var high_limit = 75
+	var low_limit = 25
 	var payload models.Message
 
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil { // guarda na referencia da memória da variavel
@@ -51,14 +59,19 @@ func (processor *RedisTaskProcessor) ProcessTaskProcessOrder(ctx context.Context
 		return fmt.Errorf("failed asking chat gpt: %w", asynq.SkipRetry)
 	}
 
-	if response >= 75 {
+	if riskLevels[payload.Risk] {
+		high_limit = 95
+		low_limit = 5
+	}
+
+	if response >= high_limit {
 		if err := processor.alpaca_client.BuyPosition(response, payload.Symbols[0], payload.Risk); err != nil {
 			return fmt.Errorf("failed to buy: %w", asynq.SkipRetry)
 		}
 		fmt.Println("Buy: ", payload)
 		return nil
 
-	} else if response <= 25 && response > 0 {
+	} else if response <= low_limit && response > 0 {
 
 		if err := processor.alpaca_client.SellPosition(payload.Symbols[0], response, payload.Risk); err != nil {
 			return fmt.Errorf("failed to sell, or short: %w", err)
