@@ -1,14 +1,17 @@
+// Package initialize serves to initialize the configs.
 package initialize
 
 import (
 	"os"
 )
 
+// Redisonfig is the initial Alpaca api config.
 type RedisConfig struct {
 	Address  string
 	Password string
 }
 
+// LoadRedisConfigs loads the redis configs with the values from .env.
 func LoadRedisConfigs() *RedisConfig {
 	cfg := &RedisConfig{
 		Address:  "",

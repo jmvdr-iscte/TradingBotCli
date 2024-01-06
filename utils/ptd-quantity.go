@@ -1,3 +1,4 @@
+// Package utils encapsulates all the utilities.
 package utils
 
 import (
@@ -7,6 +8,8 @@ import (
 	"github.com/jmvdr-iscte/TradingBotCli/enums"
 )
 
+// SellPTDQuantity returns the quantity of the sell, given the buying power, risk, sentiment
+// response and the latest quote of the stock.
 func SellPDTQuantity(response int64, buying_power float64, latest_quote float64, risk enums.Risk) int64 {
 	multiplier, err := RiskPDTMultiplier(risk)
 	if err != nil {
@@ -27,6 +30,8 @@ func SellPDTQuantity(response int64, buying_power float64, latest_quote float64,
 	return 0
 }
 
+// BuyPDTQuantity returns the quantity of the buy, given the buying power, risk, sentiment
+// response and the latest quote of the stock.
 func BuyPDTQuantity(response int64, buying_power float64, latest_quote float64, risk enums.Risk) int64 {
 
 	multiplier, err := RiskPDTMultiplier(risk)
@@ -48,6 +53,7 @@ func BuyPDTQuantity(response int64, buying_power float64, latest_quote float64, 
 	return 0
 }
 
+// RiskPDTMultiplier returns the multiplier, given the risk.
 func RiskPDTMultiplier(risk enums.Risk) (float64, error) {
 	switch risk {
 	case enums.Low:

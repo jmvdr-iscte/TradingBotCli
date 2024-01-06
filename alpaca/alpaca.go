@@ -1,3 +1,5 @@
+// Package alpaca provides auxiliary functions to connect with
+// the Alpaca API.
 package alpaca
 
 import (
@@ -12,11 +14,15 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// A AlpacaClient serves as the client who interacts with the Alpaca API,
+// it can interact via a tradeClient and a dataClient.
 type AlpacaClient struct {
 	tradeClient *alpaca.Client
 	dataClient  *marketdata.Client
 }
 
+// LoadClient returns a pointer to the AlpacaClient
+// The AlpacaClient is made up of the tradeClient and a dataClient.
 func LoadClient() *AlpacaClient {
 
 	configs := initialize.LoadAlpaca()
@@ -35,25 +41,27 @@ func LoadClient() *AlpacaClient {
 	}
 }
 
-func (client *AlpacaClient) ClearOrders() error {
-	orders, err := client.tradeClient.GetOrders(alpaca.GetOrdersRequest{
-		Status: "open",
-		Until:  time.Now(),
-		Limit:  100,
-	})
+// func (client *AlpacaClient) ClearOrders() error {
+// 	orders, err := client.tradeClient.GetOrders(alpaca.GetOrdersRequest{
+// 		Status: "open",
+// 		Until:  time.Now(),
+// 		Limit:  100,
+// 	})
 
-	if err != nil {
-		return err
-	}
-	for _, order := range orders {
-		if err := client.tradeClient.CancelOrder(order.ID); err != nil {
-			return err
-		}
-	}
-	fmt.Printf("%d order(s) cancelled\n", len(orders))
-	return nil
-}
+// 	if err != nil {
+// 		return err
+// 	}
+// 	for _, order := range orders {
+// 		if err := client.tradeClient.CancelOrder(order.ID); err != nil {
+// 			return err
+// 		}
+// 	}
+// 	fmt.Printf("%d order(s) cancelled\n", len(orders))
+// 	return nil
+// }
 
+// ClosePositions returns an error if we were not able to connect to the API,
+// otherwise it returns nil.
 func (client *AlpacaClient) ClosePositions() error {
 	req := alpaca.CloseAllPositionsRequest{
 		CancelOrders: true,
@@ -65,6 +73,9 @@ func (client *AlpacaClient) ClosePositions() error {
 	return nil
 }
 
+// TradeOrder returns an error if it was not able to send an order to the API.
+// It can make sorts, regular orders, stop loss orders, etc..., depending on the
+// context that is called.
 func (client *AlpacaClient) TradeOrder(symbol string, qty int64, side enums.OrderAction) error {
 	orderAction, err := enums.ProcessOrderAction(side)
 	if err != nil {
@@ -97,6 +108,9 @@ func (client *AlpacaClient) TradeOrder(symbol string, qty int64, side enums.Orde
 	return nil
 }
 
+// IsMarketOpen returns true and nil if the market is currently open,
+// otherwise it returns false and nil. If there is a problem getting the time it returns
+// false and an error to go with it.
 func (client *AlpacaClient) IsMarketOpen() (bool, error) {
 	clock, err := client.tradeClient.GetClock()
 	if err != nil {
@@ -124,6 +138,11 @@ func (client *AlpacaClient) IsMarketOpen() (bool, error) {
 	return false, nil
 }
 
+// HaveTrades returns true and nil if the user is not considered a
+// PTD with less than 25.000$ in the account and still has trades for the rest of the week.
+// If he is a PTD with more than 25.000$ in the account this wil always return true and nil.
+// In any other case this function returns false. And in case of an error, this function returns
+// false and error.
 func (client *AlpacaClient) HaveTrades() (bool, error) {
 	dayTradingCount, err := client.GetDayTradingCount()
 	if err != nil {
@@ -141,6 +160,8 @@ func (client *AlpacaClient) HaveTrades() (bool, error) {
 	return true, nil
 }
 
+// getBuyingPower returns a float64 of the user's buying power,
+// if anything goes wrong it returns 0 and an error.
 func (client *AlpacaClient) getBuyingPower() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
@@ -149,6 +170,8 @@ func (client *AlpacaClient) getBuyingPower() (float64, error) {
 	return account.BuyingPower.InexactFloat64(), nil
 }
 
+// GetDayTradingByingPower returns a float64 of the user's  day trading buying power,
+// if anything goes wrong it returns 0 and an error.
 func (client *AlpacaClient) GetDayTradingBuyingPower() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
@@ -157,6 +180,8 @@ func (client *AlpacaClient) GetDayTradingBuyingPower() (float64, error) {
 	return account.DaytradingBuyingPower.InexactFloat64(), nil
 }
 
+// GetEquity returns a float64 of the user's equity,
+// if anything goes wrong it returns 0 and an error.
 func (client *AlpacaClient) GetEquity() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
@@ -165,22 +190,8 @@ func (client *AlpacaClient) GetEquity() (float64, error) {
 	return account.Equity.InexactFloat64(), nil
 }
 
-func (client *AlpacaClient) GetDayTradingCount() (int64, error) {
-	account, err := client.tradeClient.GetAccount()
-	if err != nil {
-		return 0, fmt.Errorf("get account %w", err)
-	}
-	return account.DaytradeCount, nil
-}
-
-func (client *AlpacaClient) IsBlocked() (bool, error) {
-	account, err := client.tradeClient.GetAccount()
-	if err != nil {
-		return true, fmt.Errorf("get account %w", err)
-	}
-	return account.AccountBlocked, nil
-}
-
+// GetCash returns a float64 of the user's cash,
+// if anything goes wrong it returns 0 and an error.
 func (client *AlpacaClient) GetCash() (float64, error) {
 	account, err := client.tradeClient.GetAccount()
 	if err != nil {
@@ -189,6 +200,52 @@ func (client *AlpacaClient) GetCash() (float64, error) {
 	return account.Cash.InexactFloat64(), nil
 }
 
+// GetDayTradingCount returns the amount of trades the user has done in a week.
+// This is important so we can prevent accounts from getting tagged with PTD.
+func (client *AlpacaClient) GetDayTradingCount() (int64, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return 0, fmt.Errorf("get account %w", err)
+	}
+	return account.DaytradeCount, nil
+}
+
+// isBlocked returns true if the account is blocked in Alpaca
+// otherwise it returns false. And it returns an error if an error is found.
+func (client *AlpacaClient) IsBlocked() (bool, error) {
+	account, err := client.tradeClient.GetAccount()
+	if err != nil {
+		return true, fmt.Errorf("get account %w", err)
+	}
+	return account.AccountBlocked, nil
+}
+
+// getLastQuote returns the latest active quote of a stock( if you have unlimited subscription
+// please change it to marketdata.SIP). If it is unable to get the latest quote it returns a
+// default price of 20.
+func (client *AlpacaClient) getLastQuote(symbol string, side enums.OrderAction) (float64, error) {
+	req := marketdata.GetSnapshotRequest{
+		Feed:     marketdata.IEX,
+		Currency: "USD",
+	}
+
+	gmeSnapshot, err := client.dataClient.GetSnapshot(symbol, req)
+	if err != nil {
+		return 20.0, fmt.Errorf("get snapshot: %w", err)
+	}
+
+	if gmeSnapshot == nil || gmeSnapshot.LatestQuote == nil {
+		return 20.0, fmt.Errorf("snapshot or latest quote is nil")
+	}
+	if enums.Buy == side {
+		return gmeSnapshot.LatestQuote.AskPrice, nil
+	}
+	return gmeSnapshot.LatestQuote.BidPrice, nil
+}
+
+// SellPosition is a function that takes care of every variable and property regarding
+// a sell or a short. It returns nil if a short or a sell was sucessfully placed, and an error
+// otherwise.
 func (client *AlpacaClient) SellPosition(symbol string, response int, risk enums.Risk) error {
 	buyingPower, err := client.getBuyingPower()
 	if err != nil {
@@ -220,6 +277,9 @@ func (client *AlpacaClient) SellPosition(symbol string, response int, risk enums
 	return nil
 }
 
+// BuyPosition is a function that takes care of every variable and property regarding
+// a buy. It returns nil if a buywas sucessfully placed, and an error
+// otherwise.
 func (client *AlpacaClient) BuyPosition(response int, symbol string, risk enums.Risk) error {
 	buy_quantity, err := client.GetQuantity(response, symbol, enums.Buy, risk)
 	if err != nil {
@@ -231,31 +291,16 @@ func (client *AlpacaClient) BuyPosition(response int, symbol string, risk enums.
 	return nil
 }
 
-func (client *AlpacaClient) getLastQuote(symbol string) (float64, error) {
-	req := marketdata.GetSnapshotRequest{
-		Feed:     marketdata.IEX,
-		Currency: "USD",
-	}
-
-	gmeSnapshot, err := client.dataClient.GetSnapshot(symbol, req)
-	if err != nil {
-		return 20.0, fmt.Errorf("get snapshot: %w", err)
-	}
-
-	if gmeSnapshot == nil || gmeSnapshot.LatestQuote == nil {
-		return 20.0, fmt.Errorf("snapshot or latest quote is nil")
-	}
-
-	return gmeSnapshot.LatestQuote.AskPrice, nil
-}
-
+// GetQuantity returns the quantity in int64 of the stock to sell or buy.
+// The quantity varies according to the action(side), the risk selected and the sentiment analysis.
+// If there is a problem getting the quote or the buying power it will return 0 and an error.
 func (client *AlpacaClient) GetQuantity(response int, symbol string, side enums.OrderAction, risk enums.Risk) (int64, error) {
 	buyingPower, err := client.getBuyingPower()
 	if err != nil {
 		return 0, fmt.Errorf("error getting buying power: %w", err)
 	}
 
-	latestQuote, err := client.getLastQuote(symbol)
+	latestQuote, err := client.getLastQuote(symbol, side)
 	if err != nil {
 		fmt.Println("error getting last quote: %w", err)
 	}
@@ -276,6 +321,9 @@ func (client *AlpacaClient) GetQuantity(response int, symbol string, side enums.
 	return 0, nil
 }
 
+// stopLoss returns an error if a stop loss was not sucessfully set up.
+// The stop loss currently is set at 10% of the original value.
+// If everything goes well it returns nil.
 func (client *AlpacaClient) stopLoss(orderId string) error {
 
 	fmt.Printf("orderId %s", orderId)
@@ -309,6 +357,9 @@ func (client *AlpacaClient) stopLoss(orderId string) error {
 	return nil
 }
 
+// CanClosePositions returns true if there are 15 minutes left on the market hours
+// and closes the positions. If there are more than 15 min it returns false.
+// If there is a problem getting any data it returns false and an error.
 func (client *AlpacaClient) CanClosePositions() (bool, error) {
 	clock, err := client.tradeClient.GetClock()
 	if err != nil {

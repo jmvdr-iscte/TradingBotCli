@@ -1,15 +1,18 @@
+// Package initialize serves to initialize the configs
 package initialize
 
 import (
 	"os"
 )
 
+// AlpacaConfig is the initial Alpaca api config.
 type AlpacaConfig struct {
 	ID     string
 	Secret string
 	Url    string
 }
 
+// LoadAlpaca loads the initial config with the .env values.
 func LoadAlpaca() *AlpacaConfig {
 	cfg := &AlpacaConfig{
 		ID:     "",

@@ -1,9 +1,12 @@
+// Package enums serves as the enums class
 package enums
 
 import (
 	"fmt"
 )
 
+// Risk is the risk enum type.
+// Defines the risk of the bot.
 type Risk int
 
 const (
@@ -14,14 +17,17 @@ const (
 	Power
 )
 
+// String returns the string value of the respective enum.
 func (r Risk) String() string {
 	return [...]string{"safe", "low", "medium", "high", "power"}[r-1]
 }
 
+// EnumIndex returns the inndex of the respective enum.
 func (r Risk) EnumIndex() int {
 	return int(r)
 }
 
+// ProcessRisk turns a enum into a string
 func ProcessRisk(r Risk) (string, error) {
 	switch r {
 	case Safe:

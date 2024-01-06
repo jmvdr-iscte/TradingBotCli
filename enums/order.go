@@ -1,7 +1,9 @@
+// Package enums serves as the enums class
 package enums
 
 import "fmt"
 
+// Order
 type OrderAction int
 
 const (

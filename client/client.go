@@ -1,3 +1,5 @@
+// Package client serves as the client who connects to the news
+// server.
 package client
 
 import (
@@ -11,8 +13,12 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// NewsURL The news socket url.
 const NewsURL = "wss://stream.data.alpaca.markets/v1beta1/news"
 
+// ConnectToWebSocket makes the initial connection to the Alpaca news socket,
+// it returns an error if anything goes wrong in the connection to the socket, or
+// it the auxiliary functions of the api.
 func ConnectToWebSocket(s *news.NewsServer) error {
 	cfg := initialize.LoadAlpaca()
 	serverURL := NewsURL

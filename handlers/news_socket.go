@@ -1,3 +1,4 @@
+// Package handlers serves as the handler for connections
 package handlers
 
 import (
@@ -16,6 +17,9 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// HandleWs handles the websocket connection, as it sends asynq
+// tasks to redis, in order to deal with the buying and selling
+// opperations.
 func HandleWS(ws *websocket.Conn, s *server.NewsServer) {
 	fmt.Println("new incoming connection from client: ", ws.RemoteAddr())
 	options := []asynq.Option{
@@ -45,6 +49,8 @@ func HandleWS(ws *websocket.Conn, s *server.NewsServer) {
 	s.Mu.Unlock()
 }
 
+// readData returns an error if anything goes wrong with the connectio. It reads the data and
+// sends it to redis.
 func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option, stopChan chan bool) error {
 
 	var (
@@ -97,6 +103,9 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option, sto
 	}
 }
 
+// monitorData returns an error if it was an error cpnnecting to the api.
+// It monitors the whole system in order to be able to correctly close
+// positions and shutdown the system.
 func monitorData(s *server.NewsServer, stopChan chan<- bool) error {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()

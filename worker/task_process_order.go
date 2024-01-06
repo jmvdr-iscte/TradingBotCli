@@ -1,3 +1,4 @@
+// Package worker encapsules all the asynq modules.
 package worker
 
 import (
@@ -17,7 +18,9 @@ import (
 
 const TaskProcessOrder = "task:process_order"
 
-// TODO Replace every print with logs
+// DistributeTaskProcessOrder returns an error if anything goes wrong with
+// distributing the tasks to a redis queue. If it was able to distribute it
+// it returns nil.
 func (distributor *RedisTaskDistributor) DistributeTaskProcessOrder(
 	ctx context.Context,
 	order *models.Message,
@@ -38,6 +41,9 @@ func (distributor *RedisTaskDistributor) DistributeTaskProcessOrder(
 	return nil
 }
 
+// ProcessTaskProcessOrder returns an error if it was not able to process the task.
+// It is responsible for the sentiment analysis and caling the alpaca sdk in order to
+// sell or buy.
 func (processor *RedisTaskProcessor) ProcessTaskProcessOrder(ctx context.Context, task *asynq.Task) error {
 	riskLevels := map[enums.Risk]bool{
 		enums.Power: true,
@@ -54,7 +60,7 @@ func (processor *RedisTaskProcessor) ProcessTaskProcessOrder(ctx context.Context
 	}
 	log.Info().Msgf("Processing task: %v", task.ResultWriter().TaskID())
 
-	response, err := askGPT(processor.openai_client, payload)
+	response, err := sentimentAnalysis(processor.openai_client, payload)
 	if err != nil {
 		return fmt.Errorf("failed asking chat gpt: %w", asynq.SkipRetry)
 	}
@@ -82,7 +88,10 @@ func (processor *RedisTaskProcessor) ProcessTaskProcessOrder(ctx context.Context
 	return nil
 }
 
-func askGPT(client *openai.Client, m models.Message) (int, error) {
+// sentimentAnalysis calls the openAI sdk in order to get a sentiment analysis given a certain stock
+// it returns a response that matches the sentiment analysis. Also it returns an error if
+// it's not able to correctly process the input.
+func sentimentAnalysis(client *openai.Client, m models.Message) (int, error) {
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{

@@ -1,3 +1,4 @@
+// Package worker encapsules all the asynq modules.
 package worker
 
 import (
@@ -16,17 +17,22 @@ const (
 	QueueDefault  = "default"
 )
 
+// TaskProcessor interface, has all the function that a processor should implement-
 type TaskProcessor interface {
 	Start() error
 	ProcessTaskProcessOrder(ctx context.Context, task *asynq.Task) error
 }
 
+// RedisTaskProcessor serves to encapsulate the server
+// and other configs to processes the task.
 type RedisTaskProcessor struct {
 	server        *asynq.Server
 	alpaca_client *alpaca.AlpacaClient
 	openai_client *openai.Client
 }
 
+// New RedisTaskProcessor returns an instance of a new task
+// processor.
 func NewRedisTaskProcessor(
 	redisOpt asynq.RedisClientOpt,
 ) TaskProcessor {
@@ -53,6 +59,7 @@ func NewRedisTaskProcessor(
 	}
 }
 
+// Start initializes the asynq server.
 func (processor *RedisTaskProcessor) Start() error {
 	mux := asynq.NewServeMux() //register each task
 	mux.HandleFunc(TaskProcessOrder, processor.ProcessTaskProcessOrder)
