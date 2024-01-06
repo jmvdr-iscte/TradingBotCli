@@ -1,10 +1,11 @@
+// Package client serves as the client who connects to the news
+// server.
 package client
 
 import (
 	"fmt"
 	"io"
 
-	"github.com/jmvdr-iscte/TradingBotCli/alpaca"
 	"github.com/jmvdr-iscte/TradingBotCli/handlers"
 	"github.com/jmvdr-iscte/TradingBotCli/initialize"
 	news "github.com/jmvdr-iscte/TradingBotCli/server"
@@ -12,11 +13,14 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// NewsURL The news socket url.
 const NewsURL = "wss://stream.data.alpaca.markets/v1beta1/news"
 
+// ConnectToWebSocket makes the initial connection to the Alpaca news socket,
+// it returns an error if anything goes wrong in the connection to the socket, or
+// it the auxiliary functions of the api.
 func ConnectToWebSocket(s *news.NewsServer) error {
 	cfg := initialize.LoadAlpaca()
-	alpaca_client := alpaca.LoadClient()
 	serverURL := NewsURL
 	wsConfig, err := websocket.NewConfig(serverURL, cfg.Url)
 	fmt.Println("trying to connect to socket")
@@ -32,12 +36,12 @@ func ConnectToWebSocket(s *news.NewsServer) error {
 		return fmt.Errorf("error dialing configs: %w", err)
 	}
 
-	isMarketOpen, err := alpaca_client.IsMarketOpen()
+	isMarketOpen, err := s.AlpacaClient.IsMarketOpen()
 	if err != nil {
 		return fmt.Errorf("unable to check the market conditions %w", err)
 	}
 
-	haveTrades, err := alpaca_client.HaveTrades()
+	haveTrades, err := s.AlpacaClient.HaveTrades()
 	if err != nil {
 		return fmt.Errorf("unable to check the current trades %w", err)
 	}

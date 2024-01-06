@@ -1,3 +1,4 @@
+// Package server is used to contain the app server.
 package server
 
 import (
@@ -10,6 +11,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// NewsServer has all the fields necessary for the program to run.
 type NewsServer struct {
 	Conns            map[*websocket.Conn]bool
 	Mu               sync.Mutex
@@ -19,6 +21,7 @@ type NewsServer struct {
 	AlpacaClient     *alpaca.AlpacaClient
 }
 
+// NewsServer instanciates a pointer of a new server with the correct run options and task distributors.
 func NewServer(task_distributor worker.TaskDistributor, options *models.Options) *NewsServer {
 	alpaca_client := *alpaca.LoadClient()
 	var err error
@@ -27,6 +30,7 @@ func NewServer(task_distributor worker.TaskDistributor, options *models.Options)
 		log.Fatalf("Failed to get equity: %v", err)
 		return nil
 	}
+
 	server := &NewsServer{
 		Conns:            make(map[*websocket.Conn]bool),
 		Mu:               sync.Mutex{},
@@ -44,6 +48,7 @@ func NewServer(task_distributor worker.TaskDistributor, options *models.Options)
 	return server
 }
 
+// Shutdown ends the server procedure and colses it's websockets
 func (s *NewsServer) Shutdown() {
 
 	s.Mu.Lock()

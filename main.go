@@ -25,12 +25,12 @@ func main() {
 	var err error
 
 	for {
-		fmt.Println("Please select your preferred risk: Low, Medium, High")
+		fmt.Println("Please select your preferred risk: Safe, Low, Medium, High, Power")
 		fmt.Scanln(&risk_value)
 		risk_value = strings.ToLower(strings.TrimSpace(risk_value))
 		risk, err = coerceToRisk(risk_value)
 		if err != nil {
-			fmt.Println("Invalid input. Please enter Low, Medium, or High.")
+			fmt.Println("Invalid input. Please enter Safe Low, Medium, High or Power.")
 		} else {
 			break
 		}
@@ -59,10 +59,10 @@ func main() {
 		Addr:     redis_config.Address,
 		Password: redis_config.Password,
 	}
-	//go banana()
 
 	task_distributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(redisOpt) // tem de ser numa go routine pois tal como um servidor http, ele bloqueia se não tiver pedidos
+
 	server := news.NewServer(task_distributor, &options)
 	err = client.ConnectToWebSocket(server)
 	if err != nil {
@@ -92,23 +92,17 @@ func runTaskProcessor(redisOpt asynq.RedisClientOpt) {
 
 func coerceToRisk(risk_str string) (enums.Risk, error) {
 	switch strings.ToLower(risk_str) {
+	case "safe":
+		return enums.Safe, nil
 	case "low":
 		return enums.Low, nil
 	case "medium":
 		return enums.Medium, nil
 	case "high":
 		return enums.High, nil
+	case "power":
+		return enums.Power, nil
 	default:
 		return 0, fmt.Errorf("invalid value for Risk: %s", risk_str)
 	}
-
 }
-
-// func banana() {
-// 	ticker := time.NewTicker(5 * time.Second)
-// 	defer ticker.Stop()
-
-// 	for range ticker.C {
-// 		fmt.Println("Banana")
-// 	}
-// }
