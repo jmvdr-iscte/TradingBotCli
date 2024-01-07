@@ -29,9 +29,8 @@ TradingBotCli is a command-line tool written in Go that automates trading decisi
 
 To install TradingBotCli, clone the repository and run the following commands:
 
-```bash git clone https://github.com/yourusername/TradingBotCli.git
 ```bash
-git clone https://github.com/yourusername/TradingBotCli.git
+git clone https://github.com/jmvdr-iscte/TradingBotCli.git
 cd TradingBotCli
 make build
 ```
@@ -41,14 +40,12 @@ make build
 
 After installation, you can run the trading bot with the following command:
 
-```bash
-make start
-```
+`make start`
 
 After starting the program, you will have to pick your prefered risk level:
-```bash
-Safe, Low, Medium, High, Power
-```
+
+`Safe, Low, Medium, High, Power`
+
 These setting will influence not only the amount of trades that you can do, but also the
 value of said traids. All the values are influenced by the AI sentiment analysis, that range
 from 0 to 100.
