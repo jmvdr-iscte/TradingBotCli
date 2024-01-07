@@ -41,7 +41,6 @@ make build
 
 After installation, you can run the trading bot with the following command:
 
-bash make start
 ```bash
 make start
 ```
