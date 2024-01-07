@@ -1,3 +1,4 @@
+// Package utils encapsulates all the utilities.
 package utils
 
 import (

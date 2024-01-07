@@ -8,7 +8,18 @@ import (
 	"github.com/jmvdr-iscte/TradingBotCli/enums"
 )
 
-// SellPTDQuantity returns the quantity of the sell, given the buying power, risk, sentiment
+const (
+	lowResponseThreshold       = 20
+	mediumResponseThreshold    = 10
+	highResponseThreshold      = 5
+	veryHighResponseThreshold  = 0
+	maxResponseThreshold       = 80
+	nearMaxResponseThreshold   = 90
+	almostMaxResponseThreshold = 95
+	maxResponseValue           = 100
+)
+
+// SellPDTQuantity returns the quantity of the sell, given the buying power, risk, sentiment
 // response and the latest quote of the stock.
 func SellPDTQuantity(response int64, buying_power float64, latest_quote float64, risk enums.Risk) int64 {
 	multiplier, err := RiskPDTMultiplier(risk)
@@ -18,13 +29,13 @@ func SellPDTQuantity(response int64, buying_power float64, latest_quote float64,
 	}
 
 	switch {
-	case response > 20:
+	case response > lowResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.02/latest_quote, 4) * multiplier)))
-	case response > 10:
+	case response > mediumResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.05/latest_quote, 10) * multiplier)))
-	case response > 5:
+	case response > highResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.07/latest_quote, 14) * multiplier)))
-	case response >= 0:
+	case response >= veryHighResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.10/latest_quote, 20) * multiplier)))
 	}
 	return 0
@@ -41,13 +52,13 @@ func BuyPDTQuantity(response int64, buying_power float64, latest_quote float64, 
 	}
 
 	switch {
-	case response < 80:
+	case response < maxResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.02/latest_quote, 4) * multiplier)))
-	case response < 90:
+	case response < nearMaxResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.05/latest_quote, 10) * multiplier)))
-	case response < 95:
+	case response < almostMaxResponseThreshold:
 		return int64(math.Abs((math.Min(buying_power*0.07/latest_quote, 14) * multiplier)))
-	case response <= 100:
+	case response <= maxResponseValue:
 		return int64(math.Abs((math.Min(buying_power*0.10/latest_quote, 20) * multiplier)))
 	}
 	return 0
