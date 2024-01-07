@@ -8,7 +8,9 @@ TradingBotCli is a command-line tool written in Go that automates trading decisi
 - Interacts with the Alpaca Trade API to execute trades.
 - Utilizes Asynq for background job processing.
 - Leverages Redis for caching and storing data.
-- Uses Go-OpenAI for AI-based decision making.
+- Uses OpenAI for AI-based decision making.
+- Executes stop-loss to mitigate potential losses.
+- Gives the user capacity to choose the risk.
 
 ## Directory Structure
 
@@ -27,11 +29,11 @@ TradingBotCli is a command-line tool written in Go that automates trading decisi
 
 To install TradingBotCli, clone the repository and run the following commands:
 
-bash git clone https://github.com/yourusername/TradingBotCli.git
+```bash git clone https://github.com/yourusername/TradingBotCli.git
 ```bash
 git clone https://github.com/yourusername/TradingBotCli.git
 cd TradingBotCli
-make install
+make build
 ```
 
 
@@ -39,16 +41,33 @@ make install
 
 After installation, you can run the trading bot with the following command:
 
-bash ./TradingBotCli
+bash make start
 ```bash
-./TradingBotCli
+make start
 ```
 
+After starting the program, you will have to pick your prefered risk level:
+```bash
+Safe, Low, Medium, High, Power
+```bash
+```
+These setting will influence not only the amount of trades that you can do, but also the
+value of said traids. All the values are influenced by the AI sentiment analysis, that range
+from 0 to 100.
 
-## Contributing
+The `Safe` and `Power` will only make trades above 95 and below 5 of sentiment analysis. 
+Which will make for fewer trades, but with higher gain possibility.
+They differ in amount of money invested in each trade.
+I personally recomend this configuration if you have less than 25.000$ in your account, so you wont be affected 
+by the PTD rule.
 
-Contributions are welcome! Please feel free to submit a pull request.
+The `Low`, `Medium`, and `High` make trades above 75 and below 25 of sentiment analysis.
+These configurations allow for more trades per day and differ in amount of money invested in each 
+trade.
+I personaly recomend these configurations if you have more than 25.000$ in your account, because at that point you can safely day trade.
 
-## License
+After you selected the risk you can pick the amount of money you want to gain per day. The bot will stop 
+as soon as it reaches that limit. but if you want it to run until the end of the day select a ridiculos amount
+of earning like 1.000.000.0
 
-This project is licensed under the MIT License.
+Also please keep your pc always on so to not kill the connection.
