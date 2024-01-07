@@ -48,7 +48,6 @@ make start
 After starting the program, you will have to pick your prefered risk level:
 ```bash
 Safe, Low, Medium, High, Power
-```bash
 ```
 These setting will influence not only the amount of trades that you can do, but also the
 value of said traids. All the values are influenced by the AI sentiment analysis, that range
