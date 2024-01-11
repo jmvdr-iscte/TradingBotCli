@@ -27,14 +27,37 @@ TradingBotCli is a command-line tool written in Go that automates trading decisi
 
 ## Installation
 
-To install TradingBotCli, clone the repository and run the following commands:
+To install TradingBotCli, clone the repository and inside the ```.env```
+file and inside that file you must replace the `XXXXXX` for the correct values:
+
+The ```OPEN_AI_KEY``` Replace the `XXXXXX` value for the open_ai.txt file given.
+
+The ```APCA_API_KEY_ID``` Replace the `XXXXXX` value for the alpaca api KEY value file given.
+
+The ```APCA_API_SECRET_KEY``` Replace the `XXXXXX` value for the alpaca api SECRET value file given.
+
+The ```APCA_API_BASE_URL``` Replace the `https://paper-api.alpaca.markets` for the 
+`https://api.alpaca.markets` When you are ready to try with real money.
+
+An example: 
 
 ```bash
-git clone https://github.com/jmvdr-iscte/TradingBotCli.git
+DB_PASSWORD=BestBotEver1
+DB_NAME=trading_bot
+REDIS_ADDR=redis:6379
+
+APCA_API_KEY_ID=PK79DT5SALKZ2D1L0BR6
+APCA_API_SECRET_KEY=hoKRHUrp1qiy4BROAS1ohxopRmrxduyovUPxhi3W
+APCA_API_BASE_URL=https://paper-api.alpaca.markets
+
+OPEN_AI_KEY=sk-ut5LAW5UBJYCFYeZmInCT3BrbkFJjKJVzoqFrsva9VfvcN4z
+```
+
+After that, you can run these commands:
+```bash
 cd TradingBotCli
 make build
 ```
-
 
 ## Usage
 
