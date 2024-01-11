@@ -9,7 +9,6 @@ import (
 	"net"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 	"github.com/jmvdr-iscte/TradingBotCli/models"
 	"github.com/jmvdr-iscte/TradingBotCli/server"
@@ -89,7 +88,6 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option, sto
 
 			for _, message := range messages {
 				if len(message.Headline) != 0 {
-					message.Uid = uuid.New()
 					message.Risk = s.Options.Risk
 					err = s.Task_distributor.DistributeTaskProcessOrder(context.Background(), &message, opts...)
 					if err != nil {
