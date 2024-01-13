@@ -7,7 +7,7 @@ import (
 )
 
 // The prompt to call openAI.
-const Prompt = "Answer only with whole numbers.Rate from 1-100 the impact that this headline has on the company.Headline:"
+const Prompt = "Answer only with whole numbers.Rate from 1-100 the impact that this headline has on the company, anything above 50 is considered positive impact and below 50 is considered negative impact.Headline:"
 
 // OpenAIConfig uses the OpenAIKey.
 type OpenAIConfig struct {

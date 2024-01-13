@@ -95,7 +95,7 @@ func sentimentAnalysis(client *openai.Client, m models.Message) (int, error) {
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
+			Model: openai.GPT4TurboPreview,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
