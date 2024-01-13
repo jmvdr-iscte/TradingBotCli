@@ -6,9 +6,10 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+// The prompt to call openAI.
 const Prompt = "Answer only with whole numbers.Rate from 1-100 the impact that this headline has on the company.Headline:"
 
-// OpenAIConfig uses the OpenAIKey
+// OpenAIConfig uses the OpenAIKey.
 type OpenAIConfig struct {
 	OpenAIKey string
 }

@@ -22,8 +22,8 @@ type RedisTaskDistributor struct {
 	client *asynq.Client
 }
 
-// NewRedisTaskDistributor returns a new TaskDistributor with the given opts
-func NewRedisTaskDistributor(redisOpt asynq.RedisClientOpt) TaskDistributor { // estamos a forçar a struct a implementar a interface
+// NewRedisTaskDistributor returns a new TaskDistributor with the given opts.
+func NewRedisTaskDistributor(redisOpt asynq.RedisClientOpt) TaskDistributor {
 	client := asynq.NewClient(redisOpt)
 	return &RedisTaskDistributor{
 		client: client,

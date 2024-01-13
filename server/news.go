@@ -48,7 +48,7 @@ func NewServer(task_distributor worker.TaskDistributor, options *models.Options)
 	return server
 }
 
-// Shutdown ends the server procedure and colses it's websockets
+// Shutdown ends the server procedure and closes it's websockets.
 func (s *NewsServer) Shutdown() {
 
 	s.Mu.Lock()

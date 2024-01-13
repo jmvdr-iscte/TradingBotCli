@@ -1,4 +1,4 @@
-// Package handlers serves as the handler for connections
+// Package handlers serves as the handler for connections.
 package handlers
 
 import (
@@ -48,7 +48,7 @@ func HandleWS(ws *websocket.Conn, s *server.NewsServer) {
 	s.Mu.Unlock()
 }
 
-// readData returns an error if anything goes wrong with the connectio. It reads the data and
+// readData returns an error if anything goes wrong with the connection. It reads the data and
 // sends it to redis.
 func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option, stopChan chan bool) error {
 
@@ -101,7 +101,7 @@ func readData(ws *websocket.Conn, s *server.NewsServer, opts []asynq.Option, sto
 	}
 }
 
-// monitorData returns an error if it was an error cpnnecting to the api.
+// monitorData returns an error if there was an error connecting to the api.
 // It monitors the whole system in order to be able to correctly close
 // positions and shutdown the system.
 func monitorData(s *server.NewsServer, stopChan chan<- bool) error {
@@ -149,7 +149,6 @@ func monitorData(s *server.NewsServer, stopChan chan<- bool) error {
 
 		if can_close_positions {
 			stopChan <- true
-			fmt.Println("15 minutes left to close \n Closing all positions")
 			return nil
 		}
 	}

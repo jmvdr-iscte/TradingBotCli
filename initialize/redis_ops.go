@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// Redisonfig is the initial Alpaca api config.
+// RedisConfig is the initial Alpaca api config.
 type RedisConfig struct {
 	Address  string
 	Password string

@@ -17,8 +17,7 @@ import (
 const NewsURL = "wss://stream.data.alpaca.markets/v1beta1/news"
 
 // ConnectToWebSocket makes the initial connection to the Alpaca news socket,
-// it returns an error if anything goes wrong in the connection to the socket, or
-// it the auxiliary functions of the api.
+// it returns an error if anything goes wrong in the connection to the socket.
 func ConnectToWebSocket(s *news.NewsServer) error {
 	cfg := initialize.LoadAlpaca()
 	serverURL := NewsURL

@@ -17,7 +17,7 @@ const (
 	QueueDefault  = "default"
 )
 
-// TaskProcessor interface, has all the function that a processor should implement-
+// TaskProcessor interface, has all the function that a processor should implement.
 type TaskProcessor interface {
 	Start() error
 	ProcessTaskProcessOrder(ctx context.Context, task *asynq.Task) error

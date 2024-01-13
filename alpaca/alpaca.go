@@ -354,6 +354,7 @@ func (client *AlpacaClient) CanClosePositions() (bool, error) {
 	nextClose := clock.NextClose
 	closeTime := nextClose.Add(-15 * time.Minute)
 	if clock.IsOpen && time.Now().After(closeTime) {
+		fmt.Println("15 minutes left until market close. \n Closing all positions.")
 		err := client.ClosePositions()
 		if err != nil {
 			return true, err

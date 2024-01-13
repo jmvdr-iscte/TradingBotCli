@@ -41,7 +41,7 @@ func SellPDTQuantity(response int64, buying_power float64, latest_quote float64,
 	return 0
 }
 
-// BuyPDTQuantity returns the quantity of the buy, given the buying power, risk, sentiment
+// BuyPDTQuantity returns the quantity of the buy, given the buying power, risk, sentiment,
 // response and the latest quote of the stock.
 func BuyPDTQuantity(response int64, buying_power float64, latest_quote float64, risk enums.Risk) int64 {
 

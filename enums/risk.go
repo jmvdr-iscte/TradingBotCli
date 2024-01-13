@@ -1,4 +1,4 @@
-// Package enums serves as the enums class
+// Package enums serves as the enums class.
 package enums
 
 import (
@@ -27,7 +27,7 @@ func (r Risk) EnumIndex() int {
 	return int(r)
 }
 
-// ProcessRisk turns a enum into a string
+// ProcessRisk turns a enum into a string.
 func ProcessRisk(r Risk) (string, error) {
 	switch r {
 	case Safe:
